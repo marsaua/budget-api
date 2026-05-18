@@ -19,7 +19,6 @@ default: &default
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
-
 development:
   <<: *default
   database: budget_api_development
@@ -87,9 +86,7 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: budget_api_production
-    username: budget_api
-    password: <%= ENV["BUDGET_API_DATABASE_PASSWORD"] %>
+    url: <%= ENV["DATABASE_URL"] %>
   cache:
     <<: *primary_production
     database: budget_api_production_cache
