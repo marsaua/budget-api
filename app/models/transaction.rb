@@ -2,6 +2,9 @@ class Transaction < ApplicationRecord
   CATEGORIES = %w[food transport home household clubs kids clothes health fun gifts income other].freeze
   KINDS = %w[income expense].freeze
 
+  belongs_to :room
+  belongs_to :author, class_name: "User"
+
   validates :description, presence: true
   validates :amount, numericality: { greater_than: 0 }
   validates :kind, inclusion: { in: KINDS }
