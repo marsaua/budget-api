@@ -71,4 +71,4 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start server via Thruster by default, this can be overwritten at runtime
 EXPOSE 8080
-CMD ["bash", "-c", "bundle exec rails server -p ${PORT:-8080} -b 0.0.0.0"]
+CMD ["bash", "-c", "bundle exec rails db:migrate && bundle exec rails server -p ${PORT:-8080} -b 0.0.0.0"]
