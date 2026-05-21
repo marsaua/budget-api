@@ -22,7 +22,28 @@ module Api
         end
       end
 
+      before_action :set_room_for_mutation, only: [:update, :destroy]
+
+      def update
+        authorize @room
+        if @room.update(room_params)
+          render json: serialize(@room)
+        else
+          render json: { errors: @room.errors.full_messages }, status: :unprocessable_entity
+        end
+      end
+
+      def destroy
+        authorize @room
+        @room.destroy
+        head :no_content
+      end
+
       private
+
+      def set_room_for_mutation
+        @room = Room.find(params[:id])
+      end
 
       def find_room
         current_user.rooms.find(params[:id])
