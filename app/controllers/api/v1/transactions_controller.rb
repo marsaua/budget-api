@@ -70,7 +70,7 @@ module Api
           kind:        t.kind,
           category:    t.category,
           occurred_on: t.occurred_on.iso8601,
-          author:      { id: t.author_id, name: t.author.name }
+          author:      t.author ? { id: t.author_id, name: t.author.name } : { id: nil, name: nil }
         }
       end
     end
