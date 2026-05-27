@@ -15,8 +15,8 @@ module Api
         expense = scope.where(kind: "expense").sum(:amount)
 
         total       = scope.count
-        total_pages = [(total / PER_PAGE.to_f).ceil, 1].max
-        page        = [[params[:page].to_i, 1].max, total_pages].min
+        total_pages = [ (total / PER_PAGE.to_f).ceil, 1 ].max
+        page        = [ [ params[:page].to_i, 1 ].max, total_pages ].min
         paged_scope = scope.offset((page - 1) * PER_PAGE).limit(PER_PAGE)
 
         render json: {
