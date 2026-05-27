@@ -4,6 +4,8 @@ module Api
       before_action :set_room
       before_action :set_transaction, only: [:update, :destroy]
 
+      PER_PAGE = 20
+
       def index
         scope = policy_scope(@room.transactions).for_month(year, month).by_date
         categories = Array(params.permit(categories: [])[:categories]).reject { |c| c.blank? || Transaction::CATEGORIES.exclude?(c) }
@@ -12,12 +14,23 @@ module Api
         income  = scope.where(kind: "income").sum(:amount)
         expense = scope.where(kind: "expense").sum(:amount)
 
+        total       = scope.count
+        total_pages = [(total / PER_PAGE.to_f).ceil, 1].max
+        page        = [[params[:page].to_i, 1].max, total_pages].min
+        paged_scope = scope.offset((page - 1) * PER_PAGE).limit(PER_PAGE)
+
         render json: {
-          transactions: scope.map { |t| serialize(t) },
+          transactions: paged_scope.map { |t| serialize(t) },
           summary: {
             income:  income.to_f.round(2),
             expense: expense.to_f.round(2),
             balance: (income - expense).to_f.round(2)
+          },
+          pagination: {
+            page:        page,
+            per_page:    PER_PAGE,
+            total:       total,
+            total_pages: total_pages
           }
         }
       end
