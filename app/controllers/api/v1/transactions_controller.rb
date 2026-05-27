@@ -6,7 +6,8 @@ module Api
 
       def index
         scope = policy_scope(@room.transactions).for_month(year, month).by_date
-        scope = scope.where(category: params[:categories]) if params[:categories].present?
+        categories = Array(params.permit(categories: [])[:categories]).reject(&:blank?)
+        scope = scope.where(category: categories) if categories.present?
 
         income  = scope.where(kind: "income").sum(:amount)
         expense = scope.where(kind: "expense").sum(:amount)
