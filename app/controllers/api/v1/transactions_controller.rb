@@ -13,6 +13,11 @@ module Api
 
         income  = scope.where(kind: "income").sum(:amount)
         expense = scope.where(kind: "expense").sum(:amount)
+        by_category = scope.where(kind: "expense")
+                           .unscope(:order)
+                           .group(:category)
+                           .sum(:amount)
+                           .transform_values { |v| v.to_f.round(2) }
 
         total       = scope.count
         total_pages = [ (total / PER_PAGE.to_f).ceil, 1 ].max
@@ -22,9 +27,10 @@ module Api
         render json: {
           transactions: paged_scope.map { |t| serialize(t) },
           summary: {
-            income:  income.to_f.round(2),
-            expense: expense.to_f.round(2),
-            balance: (income - expense).to_f.round(2)
+            income:      income.to_f.round(2),
+            expense:     expense.to_f.round(2),
+            balance:     (income - expense).to_f.round(2),
+            by_category: by_category
           },
           pagination: {
             page:        page,

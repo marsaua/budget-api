@@ -128,4 +128,14 @@ class Api::V1::TransactionsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, body["pagination"]["page"]
     assert_equal 3, body["transactions"].length
   end
+
+  test "summary includes by_category breakdown from full filtered scope" do
+    get "/api/v1/rooms/#{@room.id}/transactions",
+      params: { year: 2024, month: 1 },
+      headers: { "Authorization" => @token }
+    by_cat = response.parsed_body["summary"]["by_category"]
+    assert_equal 100.0, by_cat["food"]
+    assert_equal 50.0,  by_cat["transport"]
+    assert_nil by_cat["income"]  # income transactions excluded
+  end
 end
