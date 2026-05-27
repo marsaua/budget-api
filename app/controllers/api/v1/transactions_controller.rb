@@ -5,13 +5,14 @@ module Api
       before_action :set_transaction, only: [:update, :destroy]
 
       def index
-        transactions = policy_scope(@room.transactions).for_month(year, month).by_date
+        scope = policy_scope(@room.transactions).for_month(year, month).by_date
+        scope = scope.where(category: params[:categories]) if params[:categories].present?
 
-        income  = transactions.where(kind: "income").sum(:amount)
-        expense = transactions.where(kind: "expense").sum(:amount)
+        income  = scope.where(kind: "income").sum(:amount)
+        expense = scope.where(kind: "expense").sum(:amount)
 
         render json: {
-          transactions: transactions.map { |t| serialize(t) },
+          transactions: scope.map { |t| serialize(t) },
           summary: {
             income:  income.to_f.round(2),
             expense: expense.to_f.round(2),
